@@ -1,0 +1,28 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker images
+      run: docker-compose build
+    - name: Run tests
+      run: |
+        docker-compose run backend python manage.py test
+        docker-compose run frontend npm test
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - name: Deploy to production
+      # ここにデプロイ用のスクリプトを追加
+      run: echo "Deploying to production"
